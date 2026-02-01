@@ -59,21 +59,6 @@ ENV QT_HOST_PATH=$HOST_PREFIX_PATH
 # -------------------------------------------------------------------------
 
 # ----------------------- Compile Android libs ----------------------------
-WORKDIR /opt/source/qt6/qtbase
-RUN cmake \
-    -S . \
-    -B android-build \
-    -GNinja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
-    -DCMAKE_PREFIX_PATH=$ANDROID_PREFIX_PATH-arm64-v8a \
-    -DCMAKE_INSTALL_PREFIX=$ANDROID_PREFIX_PATH-arm64-v8a \
-    -DANDROID_ABI=arm64-v8a \
-    -DANDROID_PLATFORM=android-26 \
-    -DANDROID_SDK_ROOT=$ANDROID_HOME \
-    -DQT_HOST_PATH=$QT_HOST_PATH \
-    -DQT_BUILD_TESTS=OFF \
-    -DQT_BUILD_EXAMPLES=OFF
-RUN cmake --build android-build --parallel `nproc`
-RUN cmake --install android-build
+RUN /opt/scripts/bootstrap.sh arm64-v8a
+RUN /opt/scripts/bootstrap.sh x86_64
 # -------------------------------------------------------------------------
