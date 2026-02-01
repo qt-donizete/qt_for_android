@@ -15,6 +15,9 @@ ENV ANDROID_HOME=/opt/android-sdk
 ENV ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/${NDK_VERSION}
 ENV PATH=${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:/opt/scripts
 
+ENV ANDROID_PREFIX_PATH=/opt/android
+ENV HOST_PREFIX_PATH=/opt/host
+
 RUN apt update 
 RUN apt install git cmake curl build-essential ninja-build python3 openjdk-17-jdk unzip locales -y
 RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
@@ -40,8 +43,9 @@ WORKDIR /opt/source/qt6/qtbase
 RUN cmake \
     -S . \
     -B host-build \
+    -GNinja \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/opt/host \
+    -DCMAKE_INSTALL_PREFIX=$HOST_PREFIX_PATH \
     -DQT_BUILD_TESTS=OFF \
     -DQT_BUILD_EXAMPLES=OFF \
     -DQT_FEATURE_gui=OFF \
@@ -51,7 +55,7 @@ RUN cmake \
 RUN cmake --build host-build --parallel `nproc`
 RUN cmake --install host-build
 
-ENV QT_HOST_PATH=/opt/host
+ENV QT_HOST_PATH=$HOST_PREFIX_PATH
 # -------------------------------------------------------------------------
 
 # ----------------------- Compile Android libs ----------------------------
@@ -59,9 +63,11 @@ WORKDIR /opt/source/qt6/qtbase
 RUN cmake \
     -S . \
     -B android-build \
+    -GNinja \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/opt/android \
     -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+    -DCMAKE_PREFIX_PATH=$ANDROID_PREFIX_PATH-arm64-v8a \
+    -DCMAKE_INSTALL_PREFIX=$ANDROID_PREFIX_PATH-arm64-v8a \
     -DANDROID_ABI=arm64-v8a \
     -DANDROID_PLATFORM=android-26 \
     -DANDROID_SDK_ROOT=$ANDROID_HOME \
@@ -70,3 +76,4 @@ RUN cmake \
     -DQT_BUILD_EXAMPLES=OFF
 RUN cmake --build android-build --parallel `nproc`
 RUN cmake --install android-build
+# -------------------------------------------------------------------------

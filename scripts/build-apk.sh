@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ABIS=(armeabi-v7a arm64-v8a x86 x86_64)
+ABIS=(arm64-v8a x86_64)
 
 ABI=$1
 
@@ -15,11 +15,11 @@ cmake \
   -B android-build \
   -GNinja \
   -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
-  -DANDROID_ABI=arm64-v8a \
+  -DANDROID_ABI=$ABI \
   -DANDROID_PLATFORM=android-26 \
   -DANDROID_SDK_ROOT=$ANDROID_HOME \
-  -DCMAKE_PREFIX_PATH=/opt/android \
+  -DCMAKE_PREFIX_PATH=$ANDROID_PREFIX_PATH-$ABI \
   -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=NEVER \
-  -DQT_HOST_PATH=/opt/host \
+  -DQT_HOST_PATH=$HOST_PREFIX_PATH \
   -DCMAKE_BUILD_TYPE=Release
 cmake --build android-build
