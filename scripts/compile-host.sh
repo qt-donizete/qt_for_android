@@ -16,6 +16,8 @@ cmake \
     \
     \
     \
+    \
+    \
     -DQT_BUILD_TESTS=OFF \
     -DQT_BUILD_EXAMPLES=OFF
 cmake --build host-build --parallel `nproc`

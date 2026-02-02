@@ -14,8 +14,10 @@ cmake \
     -DANDROID_ABI=$ABI \
     -DANDROID_PLATFORM=android-26 \
     -DANDROID_SDK_ROOT=$ANDROID_HOME \
+    -DANDROID_NDK_ROOT=$ANDROID_NDK_ROOT \
     -DANDROID_STL=c++_shared \
     -DQT_HOST_PATH=$QT_HOST_PATH \
+    -DQT_BUILD_DOCS=OFF \
     -DQT_BUILD_TESTS=OFF \
     -DQT_BUILD_EXAMPLES=OFF
 cmake --build android-build-$ABI --parallel `nproc`

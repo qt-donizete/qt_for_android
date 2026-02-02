@@ -56,6 +56,7 @@ RUN git clone -b ${QT_VERSION} --recurse-submodules --depth=1 https://github.com
 
 RUN /opt/scripts/compile-host.sh qtbase
 RUN /opt/scripts/compile-host.sh qtshadertools
+RUN /opt/scripts/compile-host.sh qtdeclarative
 
 ENV QT_HOST_PATH=$HOST_PREFIX_PATH
 # -------------------------------------------------------------------------
