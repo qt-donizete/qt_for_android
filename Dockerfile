@@ -65,4 +65,8 @@ ENV QT_HOST_PATH=$HOST_PREFIX_PATH
 RUN /opt/scripts/compile-android.sh arm64-v8a qtbase
 RUN /opt/scripts/compile-android.sh arm64-v8a qtshadertools
 RUN /opt/scripts/compile-android.sh arm64-v8a qtdeclarative
+
+RUN /opt/scripts/compile-android.sh x86_64 qtbase
+RUN /opt/scripts/compile-android.sh x86_64 qtshadertools
+RUN /opt/scripts/compile-android.sh x86_64 qtdeclarative
 # -------------------------------------------------------------------------
