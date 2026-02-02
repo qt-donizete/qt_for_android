@@ -18,11 +18,26 @@ ENV PATH=${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:/opt/scripts
 ENV ANDROID_PREFIX_PATH=/opt/android
 ENV HOST_PREFIX_PATH=/opt/host
 
-RUN apt update 
-RUN apt install git cmake curl build-essential ninja-build python3 openjdk-17-jdk unzip locales -y
+RUN apt update
+RUN apt install -y \
+    git \
+    cmake \
+    curl \
+    build-essential \
+    ninja-build \
+    python3 \
+    openjdk-17-jdk \
+    unzip \
+    locales \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev \
+    libgles2-mesa-dev \
+    mesa-common-dev \
+    xorg-dev
+
 RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 
-# ---------------------------- Android SDK ------------------------------------
+# ---------------------------- Android SDK --------------------------------
 WORKDIR $ANDROID_HOME/cmdline-tools
 
 RUN curl -Lo tools.zip https://dl.google.com/android/repository/commandlinetools-linux-14742923_latest.zip \
@@ -30,35 +45,23 @@ RUN curl -Lo tools.zip https://dl.google.com/android/repository/commandlinetools
     && yes | sdkmanager --licenses \
     && sdkmanager --verbose "platforms;${SDK_PLATFORM}" "build-tools;${SDK_BUILD_TOOLS}" "ndk;${NDK_VERSION}" ${SDK_PACKAGES} \
     && sdkmanager --uninstall --verbose emulator
-# ----------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 
 COPY scripts /opt/scripts
 
-# ---------------------------- Compile host libs -----------------------------
+# ---------------------------- Compile host libs --------------------------
 WORKDIR /opt/source
 
 RUN git clone -b ${QT_VERSION} --recurse-submodules --depth=1 https://github.com/qt/qt5.git qt6
 
-WORKDIR /opt/source/qt6/qtbase
-RUN cmake \
-    -S . \
-    -B host-build \
-    -GNinja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$HOST_PREFIX_PATH \
-    -DQT_BUILD_TESTS=OFF \
-    -DQT_BUILD_EXAMPLES=OFF \
-    -DQT_FEATURE_gui=OFF \
-    -DQT_FEATURE_widgets=OFF \
-    -DQT_FEATURE_opengl=OFF \
-    -DINPUT_opengl=no
-RUN cmake --build host-build --parallel `nproc`
-RUN cmake --install host-build
+RUN /opt/scripts/compile-host.sh qtbase
+RUN /opt/scripts/compile-host.sh qtshadertools
 
 ENV QT_HOST_PATH=$HOST_PREFIX_PATH
 # -------------------------------------------------------------------------
 
 # ----------------------- Compile Android libs ----------------------------
-RUN /opt/scripts/bootstrap.sh arm64-v8a
-RUN /opt/scripts/bootstrap.sh x86_64
+RUN /opt/scripts/compile-android.sh arm64-v8a qtbase
+RUN /opt/scripts/compile-android.sh arm64-v8a qtshadertools
+RUN /opt/scripts/compile-android.sh arm64-v8a qtdeclarative
 # -------------------------------------------------------------------------
