@@ -37,6 +37,8 @@ RUN apt install -y \
 
 RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 
+COPY scripts /opt/scripts
+
 # ---------------------------- Android SDK --------------------------------
 WORKDIR $ANDROID_HOME/cmdline-tools
 
@@ -46,8 +48,6 @@ RUN curl -Lo tools.zip https://dl.google.com/android/repository/commandlinetools
     && sdkmanager --verbose "platforms;${SDK_PLATFORM}" "build-tools;${SDK_BUILD_TOOLS}" "ndk;${NDK_VERSION}" ${SDK_PACKAGES} \
     && sdkmanager --uninstall --verbose emulator
 # -------------------------------------------------------------------------
-
-COPY scripts /opt/scripts
 
 # ---------------------------- Compile host libs --------------------------
 WORKDIR /opt/source
